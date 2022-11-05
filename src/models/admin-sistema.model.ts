@@ -41,7 +41,7 @@ export class AdminSistema extends Entity {
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
   })
   clave: string;
 
