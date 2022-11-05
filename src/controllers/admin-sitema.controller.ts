@@ -1,3 +1,4 @@
+import {service} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -13,11 +14,15 @@ import {
 } from '@loopback/rest';
 import {AdminSistema} from '../models';
 import {AdminSistemaRepository} from '../repositories';
+import {AutenticacionService} from '../services';
+const fetch = require('node-fetch');
 
 export class AdminSitemaController {
   constructor(
     @repository(AdminSistemaRepository)
     public adminSistemaRepository : AdminSistemaRepository,
+    @service(AutenticacionService)
+    public servicioAutenticacion : AutenticacionService
   ) {}
 
   @post('/admin')
@@ -38,7 +43,21 @@ export class AdminSitemaController {
     })
     adminSistema: Omit<AdminSistema, 'id'>,
   ): Promise<AdminSistema> {
-    return this.adminSistemaRepository.create(adminSistema);
+    //return this.adminSistemaRepository.create(adminSistema);
+    // reemplazar linea anterior por:
+    const clave = this.servicioAutenticacion.GenerarClave();
+    const cifrada = this.servicioAutenticacion.CifrarClave(clave);
+    adminSistema.clave = cifrada;
+    const p = await this.adminSistemaRepository.create(adminSistema);
+    const destino = adminSistema.email;
+    const asunto = 'Registro en la plataforma';
+    const contenido = `Hola ${adminSistema.nombre}, su usuario es:
+    ${adminSistema.email} y su contraseña es: ${clave}`;
+    fetch(`http://127.0.0.1:5000/envio-correo?correo_destino=${destino}&asunto=${asunto}&contenido=${contenido}`)
+    .then((data: any) => {
+        console.log(data);
+     });
+    return p;
   }
 
   @get('/admin/count')
