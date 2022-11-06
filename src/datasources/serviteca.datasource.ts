@@ -1,15 +1,18 @@
 import {inject, lifeCycleObserver, LifeCycleObserver} from '@loopback/core';
 import {juggler} from '@loopback/repository';
+import {Llaves} from '../config/llaves';
+
+//'mongodb+srv://betonarmo:X50QfCEjMy21KWhg@mintics2022.dthpinf.mongodb.net/servitecadevteam?retryWrites=true&w=majority'
 
 const config = {
   name: 'serviteca',
   connector: 'mongodb',
-  url: 'mongodb+srv://betonarmo:X50QfCEjMy21KWhg@mintics2022.dthpinf.mongodb.net/servitecadevteam?retryWrites=true&w=majority',
+  url: `${Llaves.cadenaConexion}`,
   host: '',
   port: 0,
   user: '',
   password: '',
-  database: '', 
+  database: '',
   useNewUrlParser: true
 };
 
