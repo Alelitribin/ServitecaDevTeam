@@ -9,21 +9,46 @@ import {
 } from '@loopback/repository';
 import {
   del, get,
-  getModelSchemaRef, param, patch, post, put, requestBody,
+  getModelSchemaRef, HttpErrors, param, patch, post, put, requestBody,
   response
 } from '@loopback/rest';
-import {AdminSistema} from '../models';
+import {Llaves} from '../config/llaves';
+import {AdminSistema, Credenciales} from '../models';
 import {AdminSistemaRepository} from '../repositories';
 import {AutenticacionService} from '../services';
 const fetch = require('node-fetch');
 
+
 export class AdminSitemaController {
   constructor(
     @repository(AdminSistemaRepository)
-    public adminSistemaRepository : AdminSistemaRepository,
+    public adminSistemaRepository: AdminSistemaRepository,
     @service(AutenticacionService)
-    public servicioAutenticacion : AutenticacionService
-  ) {}
+    public servicioAutenticacion: AutenticacionService
+  ) { }
+
+  @post('/admin/identificar')
+  @response(200, {
+    description: 'Identificación de usuarios'
+  })
+  async identificar(
+    @requestBody() creds: Credenciales
+  ) {
+    let a = await
+      this.servicioAutenticacion.IdentificarAdminSistema(creds.usuario,
+        creds.clave);
+
+    if (a) {
+      let token = this.servicioAutenticacion.GenerarTokenJWT(a)
+      return {
+        datos: {nombre: a.nombre, email: a.email, id: a.Id},
+        tk: token
+      }
+    } else {
+      throw new HttpErrors[401]('Datos invalidos');
+    }
+
+  }
 
   @post('/admin')
   @response(200, {
@@ -48,16 +73,18 @@ export class AdminSitemaController {
     const clave = this.servicioAutenticacion.GenerarClave();
     const cifrada = this.servicioAutenticacion.CifrarClave(clave);
     adminSistema.clave = cifrada;
-    const p = await this.adminSistemaRepository.create(adminSistema);
+    const a = await this.adminSistemaRepository.create(adminSistema);
     const destino = adminSistema.email;
     const asunto = 'Registro en la plataforma';
     const contenido = `Hola ${adminSistema.nombre}, su usuario es:
     ${adminSistema.email} y su contraseña es: ${clave}`;
-    fetch(`http://127.0.0.1:5000/envio-correo?correo_destino=${destino}&asunto=${asunto}&contenido=${contenido}`)
-    .then((data: any) => {
+
+    fetch(`${Llaves.urlServicioCorreo}/envio-correo?correo_destino=${destino}&asunto=${asunto}&contenido=${contenido}`)
+      //fetch(`http://127.0.0.1:5000/envio-correo?correo_destino=${destino}&asunto=${asunto}&contenido=${contenido}`)
+      .then((data: any) => {
         console.log(data);
-     });
-    return p;
+      });
+    return a;
   }
 
   @get('/admin/count')
