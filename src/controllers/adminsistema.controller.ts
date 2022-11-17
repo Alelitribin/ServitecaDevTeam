@@ -34,12 +34,12 @@ export class AdminSitemaController {
   async identificar(
     @requestBody() creds: Credenciales
   ) {
-    let a = await
+    const a = await
       this.servicioAutenticacion.IdentificarAdminSistema(creds.usuario,
         creds.clave);
 
     if (a) {
-      let token = this.servicioAutenticacion.GenerarTokenJWT(a)
+      const token = this.servicioAutenticacion.GenerarTokenJWT(a)
       return {
         datos: {nombre: a.nombre, email: a.email, id: a.Id},
         tk: token

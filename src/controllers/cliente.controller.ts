@@ -15,7 +15,7 @@ import {
 import {Cliente} from '../models';
 import {ClienteRepository} from '../repositories';
 
-@authenticate('admin')
+//@authenticate('admin')
 export class ClienteController {
   constructor(
     @repository(ClienteRepository)
@@ -44,7 +44,7 @@ export class ClienteController {
     return this.clienteRepository.create(cliente);
   }
 
-  @authenticate.skip()
+  //@authenticate.skip()
   @get('/clientes/count')
   @response(200, {
     description: 'Cliente model count',
