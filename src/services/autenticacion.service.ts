@@ -16,6 +16,7 @@ export class AutenticacionService {
   ) { }
 
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   GenerarClave() {
     const clave = generador(8, false);
     return clave;
@@ -27,6 +28,7 @@ export class AutenticacionService {
     return claveCifrada;
   }
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   IdentificarAdminSistema(usuario: string, clave: string) {
     try {
       let p = this.adminSistemaRepository.findOne({
@@ -44,8 +46,9 @@ export class AutenticacionService {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   GenerarTokenJWT(admin: AdminSistema) {
-    let token = jwt.sign({
+    const token = jwt.sign({
       data: {
         id: admin.Id,
         email: admin.email,
@@ -56,9 +59,10 @@ export class AutenticacionService {
     return token;
   }
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   ValidarTokenJWT(token: string) {
     try {
-      let datos = jwt.verify(token, Llaves.llaveJWT);
+      const datos = jwt.verify(token, Llaves.llaveJWT);
       return datos;
     } catch {
       return false;
